@@ -1,3 +1,10 @@
+/*.def
+/*.o
+/*.so
+/*.lib
+/*.log
+Makefile
+
 *.gem
 *.rbc
 /.config

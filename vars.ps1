@@ -1,0 +1,1 @@
+$Env:PATH = "E:\repos\mkxp-zr\windows\build-mingw64\bin;" + $Env:PATH
