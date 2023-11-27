@@ -2,7 +2,7 @@
 args (if app ID not provided at compile time): Application ID (Integer)\
 args (if app ID provided at compile time): none
 
-Connect to Discord
+Connect to Discord. You may provide an application ID at compile time by defining it as preprocessor macro `DISCORD_APPID`.
 
 ## Discord#update
 args: none
@@ -28,7 +28,7 @@ args: Activity details (Hash)
 
 Update discord activities/rich presence information\
 here is an rgss example
-```
+```Ruby
 Discord.update_activity({
     :details => "Overworld",
     :state => "The name of a map",
