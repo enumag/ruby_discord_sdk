@@ -119,7 +119,14 @@ VALUE discordInit(VALUE self, VALUE applicationid) {
 }
 #endif
 
+VALUE discordGetConnected(VALUE self) {
+    return _discord_connected ? Qtrue : Qfalse;
+}
+
 VALUE discordUpdate(VALUE self) {
+    if (!_discord_connected)
+        return Qnil;
+
     app.core->run_callbacks(app.core);
     return Qnil;
 }
@@ -285,7 +292,12 @@ void Init_discord()
 
   
   // module functions
+#ifdef DISCORD_APPID
+  rb_define_module_function(Discord_module, "connect", discordInit, 0);
+#else
   rb_define_module_function(Discord_module, "connect", discordInit, 1);
+#endif
+  rb_define_module_function(Discord_module, "connected?", discordGetConnected, 0);
   rb_define_module_function(Discord_module, "update", discordUpdate, 0);
   rb_define_module_function(Discord_module, "update_activity", updateActivity, 1);
   rb_define_module_function(Discord_module, "send_request_reply", sendRequestReply, 2);
