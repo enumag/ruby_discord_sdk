@@ -30,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: discord.so
+          path: discord.*
 
   build-linux:
     name: Linux
