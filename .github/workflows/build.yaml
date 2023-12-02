@@ -24,6 +24,7 @@ jobs:
         run: |
           ruby ./extconf.rb
           make
+          ls
 
       - name: Artifact
         uses: actions/upload-artifact@v3
@@ -49,6 +50,7 @@ jobs:
         run: |
           ruby ./extconf.rb
           make
+          ls
 
       - name: Artifact
         uses: actions/upload-artifact@v3
@@ -74,6 +76,7 @@ jobs:
         run: |
           ruby ./extconf.rb
           make
+          ls
 
       - name: Artifact
         uses: actions/upload-artifact@v3
