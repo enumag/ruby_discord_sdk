@@ -72,6 +72,9 @@ jobs:
 
       - name: Compile
         run: |
+          export CFLAGS="-arch x86_64 -arch arm64"
+          export CXXFLAGS="-arch x86_64 -arch arm64"
+          export LDFLAGS="-arch x86_64 -arch arm64"  
           ruby ./extconf.rb
           make
           lipo -archs discord.bundle
