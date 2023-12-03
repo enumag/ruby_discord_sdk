@@ -72,11 +72,8 @@ jobs:
 
       - name: Compile
         run: |
-          gcc -help
-          export CFLAGS="-arch x86_64 -arch arm64"
-          export CXXFLAGS="-arch x86_64 -arch arm64"
-          export LDFLAGS="-arch x86_64 -arch arm64"  
           ruby ./extconf.rb
+          sed -i'' -e "s~ARCH_FLAG = ~ARCH_FLAG = -arch x86_64 -arch arm64~g" Makefile
           make
           lipo -archs discord.bundle
 
