@@ -29,7 +29,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: *
+          path: '*'
 
   build-linux:
     name: Linux
@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: *
+          path: '*'
 
   build-macos:
     name: macOS
@@ -80,4 +80,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: *
+          path: '*'
