@@ -29,7 +29,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: discord.so
+          path: |
+            discord.so
+            Makefile
 
   build-linux:
     name: Linux
@@ -54,7 +56,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: discord.so
+          path: |
+            discord.so
+            Makefile
 
   build-macos:
     name: macOS
@@ -79,4 +83,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: discord.bundle
+          path: |
+            discord.bundle
+            Makefile
