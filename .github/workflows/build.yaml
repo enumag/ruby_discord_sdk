@@ -1,0 +1,78 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  build-windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Compile
+        run: |
+          ruby ./extconf.rb
+          make
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.job }}
+          path: discord.so
+
+  build-linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Compile
+        run: |
+          ruby ./extconf.rb
+          make
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.job }}
+          path: discord.so
+
+  build-macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+
+      - name: Compile
+        run: |
+          ruby ./extconf.rb
+          make
+          LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
+          install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.job }}
+          path: discord.bundle
