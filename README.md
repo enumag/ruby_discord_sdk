@@ -12,7 +12,7 @@ Here is an RGSS example
 ```Ruby
 module Graphics
     class << self
-        alias discord_update__ update unless defined? discord_update
+        alias discord_update__ update unless method_defined?(:discord_update__)
     end
 
     def self.update
@@ -36,8 +36,8 @@ Discord.update_activity({
     :end_timestamp => 1507665936,
     :large_image => "large_image_cloud_asset_name",
     :large_image_text => "Large Image Text",
-    :large_image => "small_image_cloud_asset_name",
-    :large_image_text => "Small Image Text",
+    :small_image => "small_image_cloud_asset_name",
+    :small_image_text => "Small Image Text",
     :party_id => "ae488379-351d-4a4f-ad32-2b9b01c91657",
     :party_size => 5,
     :party_max => 6,
