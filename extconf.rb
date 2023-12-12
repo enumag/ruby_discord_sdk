@@ -7,7 +7,7 @@ if /mswin|mingw/ =~ RUBY_PLATFORM
 elsif /darwin/ =~ RUBY_PLATFORM
     $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-R. -Wl,-R./lib -l:discord_game_sdk.dylib'
 else
-    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-R. -Wl,-R./lib -l:discord_game_sdk.so'
+    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,--rpath. -Wl,--rpath./lib -l:discord_game_sdk.so'
 end
 
 create_makefile 'discord'
