@@ -5,7 +5,7 @@ if /mswin|mingw/ =~ RUBY_PLATFORM
 elsif /linux/ =~ RUBY_PLATFORM
     $LDFLAGS += " -L./lib/x86_64 -Wl,--rpath=. -l:discord_game_sdk.so"
 elsif /darwin/ =~ RUBY_PLATFORM
-    $LDFLAGS += " -v -L. -l:discord_game_sdk.bundle"
+    $LDFLAGS += " -v -L. -l:discord_game_sdk.dylib"
 else
     raise "Unknown RUBY_PLATFORM: " + RUBY_PLATFORM
 end
