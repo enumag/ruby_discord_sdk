@@ -3,11 +3,14 @@ require 'mkmf'
 if /mswin|mingw/ =~ RUBY_PLATFORM
     find_library("discord_game_sdk", nil)
 elsif /linux/ =~ RUBY_PLATFORM
-    $LDFLAGS += " -L./lib/x86_64 -Wl,-R. -l:discord_game_sdk.so"
-elsif /macos/ =~ RUBY_PLATFORM
-    $LDFLAGS += " -L./lib/x86_64 -L./lib/aarch64 -Wl,-R. -arch x86_64 -arch arm64 -l:discord_game_sdk.dylib"
+    $LDFLAGS += " -L./lib/x86_64 -Wl,--rpath=. -l:discord_game_sdk.so"
+elsif /darwin/ =~ RUBY_PLATFORM
+    $LDFLAGS += " -v -L. -l:discord_game_sdk.bundle"
+else
+    raise "Unknown RUBY_PLATFORM: " + RUBY_PLATFORM
 end
 
-puts $LDFLAGS
+puts "RUBY_PLATFORM: " + RUBY_PLATFORM
+puts "$LDFLAGS: " + $LDFLAGS
 
 create_makefile 'discord'
