@@ -20,6 +20,7 @@ jobs:
 
       - name: Compile
         run: |
+          cp lib/x86_64/discord_game_sdk.dll .
           ruby ./extconf.rb
           make
 
@@ -43,6 +44,7 @@ jobs:
 
       - name: Compile
         run: |
+          cp lib/x86_64/discord_game_sdk.so .
           ruby ./extconf.rb
           make
 
@@ -66,10 +68,14 @@ jobs:
 
       - name: Compile
         run: |
+          ls -l /Users/runner/hostedtoolcache/Ruby/3.1.4/
+          lipo -output libdiscord_game_sdk.dylib -create lib/x86_64/discord_game_sdk.dylib lib/aarch64/discord_game_sdk.dylib
           ruby ./extconf.rb
           make
           LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
           install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
+          otool -L discord.bundle
+          lipo -archs discord.bundle
 
       - name: Artifact
         uses: actions/upload-artifact@v3
