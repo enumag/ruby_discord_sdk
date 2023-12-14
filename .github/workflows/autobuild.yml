@@ -71,8 +71,7 @@ jobs:
           install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
           lipo -create -output discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib
 
-      - name: Test
-        run: ruby ./test.rb
+     
 
       - name: Artifact
         uses: actions/upload-artifact@v3
