@@ -22,8 +22,16 @@ jobs:
 
       - name: Compile
         run: |
-          ruby ./extconf.rb
+          ruby ./extconf.rb x86_64
           make
+          cp discord.bundle discord.x86_64
+          make clean
+          ruby ./extconf.rb arm64
+          make
+          cp discord.bundle discord.arm64
+          lipo -create -output discord.bundle discord.x86_64 discord.arm64
+          LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
+          install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
 
       - name: Artifact
         uses: actions/upload-artifact@v3
