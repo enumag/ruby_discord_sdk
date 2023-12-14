@@ -15,12 +15,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: msys2/setup-msys2@v2
         with:
-          ruby-version: mingw
+          msystem: mingw64
+          install: >-
+            base-devel
+            mingw-w64-x86_64-ruby
 
       - name: Compile
+        shell: msys2 {0}
         run: |
           ruby ./extconf.rb
           make
