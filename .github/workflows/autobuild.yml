@@ -18,7 +18,7 @@ jobs:
       - name: Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 'ruby-3.1-mingw'
+          ruby-version: mingw
 
       - name: Compile
         run: |
@@ -80,7 +80,7 @@ jobs:
 
       - name: Compile
         run: |
-          ruby ./extconf.rb
+          ruby ./extconf.rb x86_64
           make
 
       - name: Artifact
