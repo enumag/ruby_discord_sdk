@@ -20,6 +20,8 @@ jobs:
           msystem: mingw64
           install: >-
             base-devel
+            mingw-w64-x86_64-autotools
+            mingw-w64-x86_64-gcc
             mingw-w64-x86_64-ruby
 
       - name: Compile
