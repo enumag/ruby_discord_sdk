@@ -27,14 +27,17 @@ jobs:
       - name: Compile
         shell: msys2 {0}
         run: |
-          ruby ./extconf.rb
+          ruby ./extconf.rb x86_64
           make
+          cp ./lib/x86_64/discord_game_sdk.dll ./discord_game_sdk.dll
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: '*'
+          path: |
+            discord.so
+            discord_game_sdk.dll
 
   build-macos:
     name: macOS
@@ -87,10 +90,13 @@ jobs:
         run: |
           ruby ./extconf.rb x86_64
           make
+          cp ./lib/x86_64/discord_game_sdk.so ./discord_game_sdk.so
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.job }}
-          path: '*'
+          path: |
+            discord.so
+            discord_game_sdk.so
         
