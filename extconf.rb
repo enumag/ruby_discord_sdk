@@ -1,13 +1,16 @@
 require 'mkmf'
 
-LIBRARY_DIR = "#{Dir.pwd}/lib/x86_64"
+$LDFLAGS += ' -v'
 
 if /mswin|mingw/ =~ RUBY_PLATFORM
     find_library("discord_game_sdk", nil)
 elsif /darwin/ =~ RUBY_PLATFORM
-    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-rpath,. -Wl,-rpath,./lib -ldiscord_game_sdk -arch arm64'
+    $LDFLAGS += ' -Wl,-rpath,. -ldiscord_game_sdk -arch arm64'
+    $ARCH_FLAG += ' -arch arm64'
 else
-    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-R. -Wl,-R./lib -l:discord_game_sdk.so'
+    $LDFLAGS += ' -Wl,-R. -l:discord_game_sdk.so'
 end
+
+puts "$LDFLAGS: " + $LDFLAGS
 
 create_makefile 'discord'

@@ -20,6 +20,9 @@ jobs:
 
       - name: Compile
         run: |
+          curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
+          unzip -o discord_game_sdk.zip -d .
+          cp lib/x86_64/discord_game_sdk.dll .
           ruby ./extconf.rb
           make
 
@@ -43,6 +46,9 @@ jobs:
 
       - name: Compile
         run: |
+          curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
+          unzip -o discord_game_sdk.zip -d .
+          cp lib/x86_64/discord_game_sdk.so .
           ruby ./extconf.rb
           make
 
@@ -66,6 +72,10 @@ jobs:
 
       - name: Compile
         run: |
+          curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
+          unzip -o discord_game_sdk.zip -d .
+          cp lib/x86_64/discord_game_sdk.dylib libdiscord_game_sdk.dylib
+          sed -i '' 's~-arch arm64~~g' extconf.rb
           ruby ./extconf.rb
           make
           LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
