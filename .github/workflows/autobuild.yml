@@ -31,6 +31,10 @@ jobs:
           make
           cp ./lib/x86_64/discord_game_sdk.dll ./discord_game_sdk.dll
 
+      - name: Test
+        shell: msys2 {0}
+        run: ruby ./test.rb
+
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -66,6 +70,9 @@ jobs:
           LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
           install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
 
+      - name: Test
+        run: ruby ./test.rb
+
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -91,6 +98,9 @@ jobs:
           ruby ./extconf.rb x86_64
           make
           cp ./lib/x86_64/discord_game_sdk.so ./discord_game_sdk.so
+
+      - name: Test
+        run: ruby ./test.rb
 
       - name: Artifact
         uses: actions/upload-artifact@v3
