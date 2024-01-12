@@ -199,7 +199,14 @@ VALUE updateActivity(VALUE self, VALUE hActivity) {
 }
 
 RB_METHOD(clearActivity) {
-    app.activities->clear_activity(app.activities, &app, NULL);
+    if (!_discord_connected)
+        return Qfalse;
+
+    // I do believe that `clear_activity` does not work
+    struct DiscordActivity activity;
+    memset(&activity, 0, sizeof(activity));
+    app.activities->update_activity(app.activities, &activity, &app, NULL);
+
     return Qtrue;
 }
 
