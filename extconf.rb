@@ -2,6 +2,8 @@ require 'mkmf'
 
 LIBRARY_DIR = "#{Dir.pwd}/lib/#{ARGV[0]}"
 
+$defs.push("-DDISCORD_APPID=#{ARGV[1]}") if ARGV.length > 1
+
 if /cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM
     find_library("discord_game_sdk", nil, LIBRARY_DIR)
 elsif /darwin/ =~ RUBY_PLATFORM
