@@ -7,6 +7,7 @@
 
 typedef struct Application {
     struct IDiscordCore* core;
+    struct IDiscordActivityManager* activities;
 } Application;
 
 typedef struct Discord_rubyCallback {
@@ -87,6 +88,8 @@ void _discordConnect(long long app_id) {
 
     enum EDiscordResult result = DiscordCreate(DISCORD_VERSION, &params, &app.core);
     _discord_connected = (result == DiscordResult_Ok);
+    
+    app.activities = app.core->get_activity_manager(app.core);
 }
 
 #ifdef DISCORD_APPID
@@ -114,8 +117,10 @@ VALUE discordGetConnected(VALUE self) {
 }
 
 VALUE discordDisconnect(VALUE self) {
-    if (_discord_connected)
+    if (_discord_connected) {
         app.core->destroy(app.core);
+        _discord_connected = 0;
+    }
 
     return Qnil;
 }
@@ -188,8 +193,13 @@ VALUE updateActivity(VALUE self, VALUE hActivity) {
     if (spectateSecret != Qnil)
         sprintf(activity.secrets.spectate, "%s", rb_string_value_cstr(&spectateSecret));
 
-    Discord_ActivityManager->update_activity(Discord_ActivityManager, &activity, &app, NULL);
+    app.activities->update_activity(app.activities, &activity, &app, NULL);
 
+    return Qtrue;
+}
+
+RB_METHOD(clearActivity) {
+    app.activities->clear_activity(app.activities, &app, NULL);
     return Qtrue;
 }
 
@@ -216,7 +226,7 @@ RB_METHOD(sendRequestReply) {
     if (rb_block_given_p())
         callback_data = (void*)block;
 
-    Discord_ActivityManager->send_request_reply(Discord_ActivityManager, NUM2LL(id), (enum EDiscordActivityJoinRequestReply)NUM2INT(response), callback_data, activityManager_callback);
+    app.activities->send_request_reply(app.activities, NUM2LL(id), (enum EDiscordActivityJoinRequestReply)NUM2INT(response), callback_data, activityManager_callback);
 
     return Qtrue;
 }
@@ -297,6 +307,7 @@ void Init_discord()
   rb_define_module_function(Discord_module, "disconnect", discordDisconnect, 0);
   rb_define_module_function(Discord_module, "update", discordUpdate, 0);
   rb_define_module_function(Discord_module, "update_activity", updateActivity, 1);
+  rb_define_module_function(Discord_module, "clear_activity", clearActivity, 0);
   rb_define_module_function(Discord_module, "send_request_reply", sendRequestReply, 2);
   rb_define_module_function(Discord_module, "add_event_callback", addEventCallback, 2);
 }
