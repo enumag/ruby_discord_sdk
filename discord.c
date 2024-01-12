@@ -7,6 +7,7 @@
 
 typedef struct Application {
     struct IDiscordCore* core;
+    struct IDiscordActivityManager* activities;
 } Application;
 
 typedef struct Discord_rubyCallback {
@@ -69,65 +70,65 @@ void DISCORD_CALLBACK Discord_onActivityInvite(void* event_data, enum EDiscordAc
 
 /* Discord */
 
+void _discordConnect(long long app_id) {
+    // Don't forget to memset or otherwise initialize your classes!
+    memset(&app, 0, sizeof(Application));
+    memset(&Discord_activityEvents, 0, sizeof(struct IDiscordActivityEvents));
+
+    Discord_activityEvents.on_activity_invite = &Discord_onActivityInvite;
+    Discord_activityEvents.on_activity_join = &Discord_onActivityJoin;
+    Discord_activityEvents.on_activity_join_request = &Discord_onActivityJoinRequest;
+    Discord_activityEvents.on_activity_spectate = &Discord_onActivitySpectate;
+
+    struct DiscordCreateParams params;
+    params.client_id = app_id;
+    params.flags = DiscordCreateFlags_NoRequireDiscord;
+    params.event_data = &app;
+    params.activity_events = &Discord_activityEvents;
+
+    enum EDiscordResult result = DiscordCreate(DISCORD_VERSION, &params, &app.core);
+    _discord_connected = (result == DiscordResult_Ok);
+    
+    app.activities = app.core->get_activity_manager(app.core);
+}
+
 #ifdef DISCORD_APPID
 VALUE discordInit(VALUE self) {
-  // Don't forget to memset or otherwise initialize your classes!
-  memset(&app, 0, sizeof(Application));
+    if (_discord_connected)
+        return Qtrue;
 
-  struct DiscordCreateParams params;
-  params.client_id = DISCORD_APPID;
-  params.flags = DiscordCreateFlags_NoRequireDiscord;
-  params.event_data = &app;
-  params.activity_events = &Discord_activityEvents;
+    _discordConnect(DISCORD_APPID);
 
-  enum EDiscordResult result = DiscordCreate(DISCORD_VERSION, &params, &app.core);
-  _discord_connected = (result == DiscordResult_Ok);
-
-  if (!_discord_connected)
-    return Qfalse;
-
-  Discord_activityEvents.on_activity_invite = &Discord_onActivityInvite;
-  Discord_activityEvents.on_activity_join = &Discord_onActivityJoin;
-  Discord_activityEvents.on_activity_join_request = &Discord_onActivityJoinRequest;
-  Discord_activityEvents.on_activity_spectate = &Discord_onActivitySpectate;
-
-  return Qtrue;
+    return rb_bool_new(_discord_connected);
 }
 #else
 VALUE discordInit(VALUE self, VALUE applicationid) {
-  // Don't forget to memset or otherwise initialize your classes!
-  memset(&app, 0, sizeof(Application));
+    if (_discord_connected)
+        return Qtrue;
 
-  struct DiscordCreateParams params;
-  params.client_id = NUM2LL(applicationid);
-  params.flags = DiscordCreateFlags_NoRequireDiscord;
-  params.event_data = &app;
-  params.activity_events = &Discord_activityEvents;
+    _discordConnect(NUM2LL(applicationid));
 
-  enum EDiscordResult result = DiscordCreate(DISCORD_VERSION, &params, &app.core);
-  _discord_connected = (result == DiscordResult_Ok);
-
-  if (!_discord_connected)
-    return Qfalse;
-
-  Discord_activityEvents.on_activity_invite = &Discord_onActivityInvite;
-  Discord_activityEvents.on_activity_join = &Discord_onActivityJoin;
-  Discord_activityEvents.on_activity_join_request = &Discord_onActivityJoinRequest;
-  Discord_activityEvents.on_activity_spectate = &Discord_onActivitySpectate;
-
-  return Qtrue;
+    return rb_bool_new(_discord_connected);
 }
 #endif
 
 VALUE discordGetConnected(VALUE self) {
-    return _discord_connected ? Qtrue : Qfalse;
+    return rb_bool_new(_discord_connected);
+}
+
+VALUE discordDisconnect(VALUE self) {
+    if (_discord_connected) {
+        app.core->destroy(app.core);
+        _discord_connected = 0;
+    }
+
+    return Qnil;
 }
 
 VALUE discordUpdate(VALUE self) {
-    if (!_discord_connected)
-        return Qnil;
+    if (_discord_connected)
+        app.core->run_callbacks(app.core);
 
-    app.core->run_callbacks(app.core);
     return Qnil;
 }
 
@@ -192,7 +193,19 @@ VALUE updateActivity(VALUE self, VALUE hActivity) {
     if (spectateSecret != Qnil)
         sprintf(activity.secrets.spectate, "%s", rb_string_value_cstr(&spectateSecret));
 
-    Discord_ActivityManager->update_activity(Discord_ActivityManager, &activity, &app, NULL);
+    app.activities->update_activity(app.activities, &activity, &app, NULL);
+
+    return Qtrue;
+}
+
+RB_METHOD(clearActivity) {
+    if (!_discord_connected)
+        return Qfalse;
+
+    // I do believe that `clear_activity` does not work
+    struct DiscordActivity activity;
+    memset(&activity, 0, sizeof(activity));
+    app.activities->update_activity(app.activities, &activity, &app, NULL);
 
     return Qtrue;
 }
@@ -220,7 +233,7 @@ RB_METHOD(sendRequestReply) {
     if (rb_block_given_p())
         callback_data = (void*)block;
 
-    Discord_ActivityManager->send_request_reply(Discord_ActivityManager, NUM2LL(id), (enum EDiscordActivityJoinRequestReply)NUM2INT(response), callback_data, activityManager_callback);
+    app.activities->send_request_reply(app.activities, NUM2LL(id), (enum EDiscordActivityJoinRequestReply)NUM2INT(response), callback_data, activityManager_callback);
 
     return Qtrue;
 }
@@ -298,8 +311,10 @@ void Init_discord()
   rb_define_module_function(Discord_module, "connect", discordInit, 1);
 #endif
   rb_define_module_function(Discord_module, "connected?", discordGetConnected, 0);
+  rb_define_module_function(Discord_module, "disconnect", discordDisconnect, 0);
   rb_define_module_function(Discord_module, "update", discordUpdate, 0);
   rb_define_module_function(Discord_module, "update_activity", updateActivity, 1);
+  rb_define_module_function(Discord_module, "clear_activity", clearActivity, 0);
   rb_define_module_function(Discord_module, "send_request_reply", sendRequestReply, 2);
   rb_define_module_function(Discord_module, "add_event_callback", addEventCallback, 2);
 }
