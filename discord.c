@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include "discord_game_sdk.h"
+#include <stdbool.h>
 
 #define Discord_ActivityManager app.core->get_activity_manager(app.core)
 #define RB_METHOD(name) VALUE name(int argc, VALUE *argv, VALUE self)
@@ -16,7 +17,7 @@ typedef struct Discord_rubyCallback {
 
 struct Application app;
 struct IDiscordActivityEvents Discord_activityEvents;
-int _discord_connected;
+bool _discord_connected;
 
 VALUE Discord_module;
 VALUE Discord_user_rb;
@@ -89,7 +90,8 @@ void _discordConnect(long long app_id) {
     enum EDiscordResult result = DiscordCreate(DISCORD_VERSION, &params, &app.core);
     _discord_connected = (result == DiscordResult_Ok);
     
-    app.activities = app.core->get_activity_manager(app.core);
+    if (_discord_connected)
+        app.activities = app.core->get_activity_manager(app.core);
 }
 
 #ifdef DISCORD_APPID
@@ -119,7 +121,7 @@ VALUE discordGetConnected(VALUE self) {
 VALUE discordDisconnect(VALUE self) {
     if (_discord_connected) {
         app.core->destroy(app.core);
-        _discord_connected = 0;
+        _discord_connected = false;
     }
 
     return Qnil;
