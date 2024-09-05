@@ -1,5 +1,8 @@
 require 'mkmf'
 
+raise "Invalid number of arguments" if ARGV.length == 0
+raise "Invalid architecture #{ARGV[0]}" if !["x86", "x86_64", "arm64", "aarch64"].include?(ARGV[0])
+
 LIBRARY_DIR = "#{Dir.pwd}/lib/#{ARGV[0]}"
 
 $defs.push("-DDISCORD_APPID=#{ARGV[1]}") if ARGV.length > 1
