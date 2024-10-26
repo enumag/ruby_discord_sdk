@@ -7,6 +7,7 @@ if /mswin|mingw/ =~ RUBY_PLATFORM
 elsif /darwin/ =~ RUBY_PLATFORM
     $LDFLAGS += ' -Wl,-rpath,. -ldiscord_game_sdk -arch arm64'
     $ARCH_FLAG += ' -arch arm64'
+    $CPPFLAGS += ' -Wno-incompatible-function-pointer-types'
 else
     $LDFLAGS += ' -Wl,-R. -l:discord_game_sdk.so'
 end
