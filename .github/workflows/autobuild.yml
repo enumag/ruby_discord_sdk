@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         uses: msys2/setup-msys2@v2
         with:
-          msystem: ucrt64
+          msystem: mingw64
           update: true
           install: >-
             base-devel
@@ -39,7 +39,9 @@ jobs:
 
       - name: Test
         shell: msys2 {0}
-        run: ruby ./test.rb
+        run: |
+          ls -la
+          ruby ./test.rb
 
       - name: Artifact
         uses: actions/upload-artifact@v7
@@ -76,6 +78,8 @@ jobs:
           lipo -create -output discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib
           ruby ./test.rb
           LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
+          echo $LIBRUBY
+          echo $LIBRUBY | sed 's~.*/~~'
           install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
 
       - name: Artifact
