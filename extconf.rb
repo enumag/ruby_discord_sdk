@@ -1,17 +1,19 @@
 require 'mkmf'
 
-$LDFLAGS += ' -v'
+raise "Invalid number of arguments" if ARGV.length == 0
+raise "Invalid architecture #{ARGV[0]}" if !["x86", "x86_64", "arm64", "aarch64"].include?(ARGV[0])
 
-if /mswin|mingw/ =~ RUBY_PLATFORM
-    find_library("discord_game_sdk", nil)
+LIBRARY_DIR = "#{Dir.pwd}/lib/#{ARGV[0]}"
+
+$defs.push("-DDISCORD_APPID=#{ARGV[1]}") if ARGV.length > 1
+
+if /cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM
+    find_library("discord_game_sdk", nil, LIBRARY_DIR)
 elsif /darwin/ =~ RUBY_PLATFORM
-    $LDFLAGS += ' -Wl,-rpath,. -ldiscord_game_sdk -arch arm64'
-    $ARCH_FLAG += ' -arch arm64'
-    $CPPFLAGS += ' -Wno-incompatible-function-pointer-types'
+    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-rpath,. -Wl,-rpath,./lib -ldiscord_game_sdk -arch ' + ARGV[0] + ' '
+    $ARCH_FLAG += '-arch ' + ARGV[0]
 else
-    $LDFLAGS += ' -Wl,-R. -l:discord_game_sdk.so'
+    $LDFLAGS += ' -L' + LIBRARY_DIR + ' -Wl,-R. -Wl,-R./lib -l:discord_game_sdk.so'
 end
-
-puts "$LDFLAGS: " + $LDFLAGS
 
 create_makefile 'discord'
