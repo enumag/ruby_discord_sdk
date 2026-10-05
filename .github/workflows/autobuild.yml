@@ -1,9 +1,10 @@
 name: Autobuild
 
 on:
-  push:
-    branches:
-      - '*'
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - '*'
 
 jobs:
   build-windows:
