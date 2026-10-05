@@ -18,10 +18,13 @@ jobs:
         with:
           ruby-version: '3.1'
 
-      - name: Compile
+      - name: SDK
         run: |
           curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
           unzip -o discord_game_sdk.zip -d .
+
+      - name: Compile
+        run: |
           ruby ./extconf.rb x86_64
           make
 
@@ -43,10 +46,13 @@ jobs:
         with:
           ruby-version: '3.1'
 
-      - name: Compile
+      - name: SDK
         run: |
           curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
           unzip -o discord_game_sdk.zip -d .
+
+      - name: Compile
+        run: |
           ruby ./extconf.rb x86_64
           make
 
@@ -68,17 +74,27 @@ jobs:
         with:
           ruby-version: '3.1'
 
-      - name: Compile
+      - name: SDK
         run: |
           curl -O https://dl-game-sdk.discordapp.net/3.2.1/discord_game_sdk.zip
           unzip -o discord_game_sdk.zip -d .
+
+      - name: Compile x86_64
+        run: |
           ruby ./extconf.rb x86_64
           make
           cp discord.bundle discord.x86_64
           make clean
+
+      - name: Compile arm64
+        run: |
           ruby ./extconf.rb arm64
           make
           cp discord.bundle discord.arm64
+          make clean
+
+      - name: Universal build
+        run: |
           lipo -create -output discord.bundle discord.x86_64 discord.arm64
           lipo -create -output discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib
           LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
