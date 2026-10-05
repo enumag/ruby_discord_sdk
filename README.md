@@ -15,13 +15,6 @@ This will generate a makefile, for the uninitiated that is a glorified list of c
 You're going to run the build process twice, one time for x86_64 and one time for arm64. each time you should save the resulting .bundle as a separate file, i save them with their architecture as the file extension.\
 Once you have both versions of the extension, run `lipo -create -output discord.bundle discord.x86_64 discord.arm64`to create a universal version.\
 You'll also want to run `lipo -create -output discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib` to create a universal version of the discord sdk itself
-One more thing! "Because macOS", you need to do a little meddling with your final `discord.bundle` in order to get it to work with mkxp-z.
-Run these commands:
-```
-LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
-install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
-```
-This changes where the extension will look when trying to link itself to Ruby.
 
 If you don't own a mac or linux computer and would still like to compile the extension to hide your game's app id, you can duplicate the extension's github repository and add your game's app ID to each instance of `ruby ./extconf.rb [arch]`inside autobuild.yml
 ## Functions
