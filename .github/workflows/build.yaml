@@ -81,6 +81,7 @@ jobs:
 
       - name: Compile x86_64
         run: |
+          mv ./lib/x86_64/discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib
           ruby ./extconf.rb x86_64
           make
           cp discord.bundle discord.x86_64
@@ -88,6 +89,8 @@ jobs:
 
       - name: Compile arm64
         run: |
+          mv ./lib/aarch64 ./lib/arm64
+          mv ./lib/arm64/discord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib
           ruby ./extconf.rb arm64
           make
           cp discord.bundle discord.arm64
@@ -97,8 +100,6 @@ jobs:
         run: |
           lipo -create -output discord.bundle discord.x86_64 discord.arm64
           lipo -create -output discord_game_sdk.dylib ./lib/x86_64/libdiscord_game_sdk.dylib ./lib/arm64/libdiscord_game_sdk.dylib
-          LIBRUBY=`otool -L discord.bundle | grep libruby | awk '{print $1}'`
-          install_name_tool -change $LIBRUBY @rpath/`echo $LIBRUBY | sed 's~.*/~~'` discord.bundle
 
       - name: Artifact
         uses: actions/upload-artifact@v7
