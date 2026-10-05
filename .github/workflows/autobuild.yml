@@ -21,14 +21,12 @@ jobs:
           ruby-version: '3.1'
 
       - name: Compile
-        shell: msys2 {0}
         run: |
           ruby ./extconf.rb x86_64
           make
           cp ./lib/x86_64/discord_game_sdk.dll ./discord_game_sdk.dll
 
       - name: Test
-        shell: msys2 {0}
         run: ruby ./test.rb
 
       - name: Artifact
